@@ -103,17 +103,44 @@ Reason: in a prototype, bindings in a readable, diffable text file beat the
 serialized blob. The script only registers an action if it doesn't already
 exist, so it steps aside the day we move them into the editor.
 
-### To evaluate in playtesting
+### Playtest verdict — 2026-09-06
 
-- Is amplitude 85 px on PlatformB too much? The jump peaks at ~108 px.
-- The nastiest jump is C -> D: in the worst phase alignment that's ~195 px of
-  height difference, meaning **you have to wait**. Rhythm, or dead time?
-- Do the desynced frequencies read as "alive" or as "random"?
-- Coyote time at 0: how much worse does it actually get?
+Tested on Godot 4.7.2 (Linux/WSLg, software rendering).
 
-### Still undecided
+**The feel is fine.** Better than expected for a first prototype: not
+frustrating, the jump reads, landing on a moving target works. So the original
+question — fun or frustrating? — is answered, and it isn't the blocker.
 
-- Camera (a single fixed screen for now, everything visible).
-- What happens when two platforms cross each other.
-- Whether the oscillation should react to the player (breathing that speeds up)
-  — a candidate for prototype 02/03.
+**But the mechanic is a dead end.** Moving blocks are a done-to-death
+platformer staple, and this isn't the direction the game is looking for. The
+oscillation reads as "a platform that moves", not as anything the working title
+promises. No amount of tuning amplitude, frequency or phase changes that: the
+problem is the concept, not the numbers.
+
+Consequence: **do not iterate on this prototype.** The specific open questions
+(PlatformB's amplitude, the C -> D wait, coyote time at 0) are moot — they'd be
+tuning something we're not going to build.
+
+### What carries over
+
+The mechanic is dead, the plumbing is not. Reusable as-is in the next
+prototypes:
+
+- `scripts/player.gd` — the character, with tuning that already feels right.
+- The `AnimatableBody2D` + `sync_to_physics` approach, for anything that has to
+  carry the player.
+- Threshold respawn + checkpoint area.
+
+### Open for prototype 02
+
+The thing to attack is that oscillation was applied to the **level geometry**.
+Candidates that move it elsewhere:
+
+- Move it to **perception**: geometry stays mechanically honest, the rendering
+  of it breathes. Visual instability, stable collisions.
+- Move it to **existence**: platforms don't travel, they phase in and out on a
+  cycle. Rhythm without movement.
+- Move it to **the player**: gravity, scale or control response breathes rather
+  than the world.
+
+Undecided regardless of direction: camera (a single fixed screen for now).

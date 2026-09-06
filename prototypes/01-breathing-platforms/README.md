@@ -3,6 +3,11 @@
 **Question:** is jumping on vertically oscillating platforms fun (rhythm,
 timing) or frustrating (eaten jumps, falls that don't feel like your fault)?
 
+> **Answered — closed, not iterated on.** The feel is fine, but moving blocks
+> are a done-to-death staple and not the direction we want. Kept as reference
+> for the character controller and the moving-platform plumbing. See the
+> playtest verdict in [`../../docs/design-notes.md`](../../docs/design-notes.md).
+
 ## Playing it
 
 Open **this folder** as a Godot 4 project (Import → select

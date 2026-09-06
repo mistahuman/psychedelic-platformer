@@ -23,9 +23,9 @@ prototype folder (not the repo root) → **Run** (F5).
 
 ## Prototypes
 
-| # | Folder | Question |
-|---|---|---|
-| 01 | [`01-breathing-platforms`](prototypes/01-breathing-platforms/) | Is jumping on oscillating platforms fun or frustrating? |
+| # | Folder | Question | Verdict |
+|---|---|---|---|
+| 01 | [`01-breathing-platforms`](prototypes/01-breathing-platforms/) | Is jumping on oscillating platforms fun or frustrating? | Fine to play, wrong direction — closed |
 
 ## Conventions
 
