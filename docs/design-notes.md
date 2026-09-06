@@ -480,3 +480,110 @@ Convention from here: in a hand-authored scene, **export paths, not nodes.**
 - No reason to walk back yet. 03 manufactured one; here backtracking happens only
   when you hit a dead end. If the verdict is "did not notice", the first thing to
   try is a there-and-back objective, not a bigger lantern.
+
+---
+
+## Wick — the game the prototypes were feeding
+
+**Not a prototype.** It lives in `game/`, not `prototypes/`, and it is the first
+thing here with a beginning, a middle and an end.
+
+### The verdict that produced it, 2026-09-06
+
+All four prototypes were played. The verdict was blunt and it was right:
+**"non c'è un inizio e una fine, non si capisce nulla di nessuno."**
+
+That is a harsher failure than the one the design notes had been circling. The
+notes kept asking whether each mechanic was *good*. The actual problem was that
+none of them was *legible*. In 03 the platforms move off camera — and the player
+has no way of learning that they moved, so the experience is not surprise, it is
+confusion. In 04 the maze changes and updates the memory silently. Four sandboxes
+with a help label in the corner, and no moment in any of them where the game says
+*that just happened*.
+
+The concept survives the verdict; the presentation never existed. Recorded so it
+is not re-learned: **a mechanic the player cannot perceive is not a subtle
+mechanic, it is an absent one.**
+
+### What was actually missing
+
+1. **A frame.** A title that states the rule in five lines, and an ending that
+   says in numbers what just happened to you. The prototypes had neither, so
+   there was nothing to understand or to have understood.
+2. **Confirmation at the moment of the mechanic.** When the lantern relights a
+   cell and finds the memory of it was wrong, that cell now **flashes pink** and
+   a counter ticks. This is the single most important addition in the whole
+   project: it converts an invisible rule into an event.
+3. **Stakes and an end condition.** The wick burns down over 80 seconds and the
+   lantern radius shrinks with it, so the maze does not get harder — you get less
+   able to read it. Three flasks of oil buy time back, capped at a full wick.
+4. **A visible objective.** The door is drawn even through unexplored dark. Being
+   lost should be about the route; the prototypes made it about the goal as well,
+   and two unknowns at once reads as having no goal at all.
+
+### Which cells are allowed to change, and how that was found
+
+Decided by measurement rather than by taste — and the measurement lied for
+several rounds before it told the truth, which is the more useful half of the
+story.
+
+A headless harness walks the solved route out and back twice and reports how
+often the player is caught out. Early rounds all reported **zero catches**, no
+matter how the filters were tuned, while a dozen contradictions sat unvisited at
+the end of every run. The conclusion drawn from that — that changes were landing
+in places the player never returns to — was **wrong**, or at least unproven: the
+harness walked onto the exit cell on its first lap, which ends the run, freezes
+the maze and turns laps two through four into no-ops. Every comparison made
+against it was a comparison between two frozen mazes.
+
+With the harness stopping three cells short of the exit, the same build scored
+**41 changes, 35 of them caught.** The filters were not failing. The ruler was.
+
+What the filters ended up being, in order of how much each one matters:
+
+- **Only cells the player has already seen.** There is no memory to contradict
+  otherwise, so the change cannot be perceived and may as well not happen.
+- **Only cells touching one the player has actually walked through.** A maze
+  sends you back down your own corridors sooner or later, and finding the
+  corridor you came in by has become a wall is the moment this game exists to
+  produce. Merely *seen* includes cells glimpsed once from across a gap, which
+  is a much weaker bet.
+- **Only cells looked at in the last 14 seconds**, and **only within about three
+  cells beyond the lantern's edge** — around the corner, in the blind spot the
+  walls make, rather than somewhere across the maze.
+- Never lit, never the start, the exit or an oil cell, and never a change that
+  breaks the flood fill from the player to the door.
+
+Candidates are **enumerated**, not sampled. Throwing 24 random darts at a 23x13
+grid to find one of a handful of eligible cells succeeded about a third of the
+time and starved the change rate to a sixth of what it should have been.
+
+Together these are so effective that the change rate had to come **down** hard —
+from 2.2/s to **0.45/s**. At the old rate the maze rearranged itself roughly once
+a second in the player's face, which is chaos, not tension. At 0.45 a run of
+heavy backtracking scores about seven changes and seven catches.
+
+### On tuning this by hand
+
+That last number is a floor and a guess, not a setting. The harness walks the
+same route repeatedly, which maximises catches; a real player exploring new
+ground will be caught out less often. **How often the maze should get you is a
+feel question no harness can settle**, so `F3` toggles the change on and off
+mid-run and `[` / `]` move the rate, undocumented on the title screen.
+
+### Kept from the prototypes
+
+- The three layers (`cells` / `memory` / `light`) and the one substitution in
+  `maze_view.gd` that draws unlit cells from memory. That is still the mechanic.
+- Connectivity by flood fill before every change is committed.
+- Wall density held at the generated value.
+- Circle collision on the walker.
+
+### Open
+
+- No audio. A sound at the moment of a correction would probably do more than any
+  further visual work.
+- The catch rate still depends on how much the player backtracks, and nothing
+  currently *makes* them backtrack except dead ends and oil. If playtesting says
+  the mechanic fires too rarely, that is the lever — not the mutation rate.
+- One maze size, one difficulty, no progression.

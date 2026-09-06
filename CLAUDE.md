@@ -1,14 +1,30 @@
 # psychedelic-platformer — Claude Code context
 
-A 2D platformer in Godot 4 / GDScript, **working title**. Nothing here is the game:
-the repo is a sequence of throwaway prototypes, each one answering a single design
-question by being played. The game gets assembled later, from whatever survives.
+Godot 4 / GDScript. Two things live here:
 
-Started 2026-09-06. No engine or stack decision beyond Godot 4 — the rest is open.
+- **`game/` — Wick.** The actual game: a top-down maze lit by a burning lantern that
+  rearranges itself where you cannot see, while the map in your head stays stale.
+  Small and finished-shaped: title, run, ending. **This is the thing now.**
+- **`prototypes/` — four dead ends and one surviving idea.** Kept as a record.
 
-## The method
+Started 2026-09-06. The repo name is stale: it is not a platformer any more.
 
-This is the part to respect; the code is downstream of it.
+## What went wrong with the method, and what replaced it
+
+The original method was: one prototype, one design question, played, then a dated
+verdict. It produced four prototypes and one playtest. Three of the four were judged
+at the desk, which is not the method — it is the method's paperwork.
+
+When they were finally all played, the verdict was that **none of them was legible**:
+no beginning, no end, and no moment where the game tells you the mechanic just fired.
+The notes had been asking whether each mechanic was *good* while the real problem was
+that the player could not perceive it at all.
+
+So the unit of work changed. **Not "one question per prototype" but "one playable
+thing with a beginning and an end".** Wick is that. The rules below still hold for
+anything genuinely exploratory, but they are no longer the default mode of the repo.
+
+### The old method, still useful for side experiments
 
 1. One prototype = **one design question**, written at the top of its README.
 2. It is a **standalone Godot project** under `prototypes/NN-slug/`, with its own
@@ -83,6 +99,18 @@ Same for the respawn (threshold on `y` + a checkpoint `Area2D`) and, when someth
 to carry the player, `AnimatableBody2D` + `sync_to_physics` rather than reparenting or
 copying deltas by hand.
 
+## Working on Wick
+
+- **Legibility first.** A mechanic the player cannot perceive is not subtle, it is
+  absent. Every rule the game has must have a moment on screen where it announces
+  itself — for the maze changing, that is the pink flash and the counter.
+- **Decide by measuring where you can.** Which cells are allowed to change was settled
+  by a headless harness that walks the route and counts how often the player is
+  actually caught out, not by taste. The first version scored zero. See the table in
+  the design notes.
+- **Smoke-test after every edit:** `godot --headless --path game --quit`. Skipping it
+  once cost several minutes chasing a hang that was a one-line type-inference error.
+
 ## Status
 
 - 01 breathing platforms — **closed 2026-09-06.** Feel fine, concept a dead end.
@@ -100,6 +128,9 @@ The camera stopped being an open question at 03: "off camera" needs a scrolling 
 so the corridor is ~3 screens wide and crossed twice. 04 went back to a single fixed
 screen — there the lantern, not the camera, is what bounds sight.
 
-**Two prototypes are now built and unplayed.** That is one more than the method
-tolerates: the next session plays them and writes verdicts before anything else is
-built.
+- **Wick** — built 2026-09-06, playable start to finish. All four prototypes were
+  played and found unreadable; Wick is the answer to that, keeping only the one idea
+  worth keeping.
+
+Next: play Wick, and tune the one number that matters — how often the maze actually
+manages to catch you out.
