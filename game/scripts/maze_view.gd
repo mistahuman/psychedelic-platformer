@@ -87,9 +87,20 @@ func _draw_exit(cell: float, size: Vector2) -> void:
 	var amount: float = maze.light[i]
 	var seen: bool = maze.memory[i] != maze.UNKNOWN
 	var at := Vector2(c) * cell
-	var pulse := 0.62 + 0.38 * sin(_time * 2.0)
-	# Visible even through unexplored dark: being lost should be about the route,
-	# not about the objective. At 0.18 it read as a grey smudge and the player
-	# had nothing to aim at at all.
-	var alpha := lerpf(0.45 * pulse, 1.0, amount) if seen else 0.40 * pulse
-	draw_rect(Rect2(at + size * 0.18, size * 0.64), Color(exit_color, alpha))
+	var pulse := 0.78 + 0.22 * sin(_time * 2.0)
+	# A halo under the door so it reads as a glow rather than a tile. At the
+	# alphas this started with it was a dark square in a dark corner — the
+	# player was told to head for a light they could not actually see.
+	var strength := (0.92 if seen else 0.68) * pulse
+	draw_rect(
+		Rect2(at - size * 0.35, size * 1.7),
+		Color(exit_color, 0.10 * strength)
+	)
+	draw_rect(
+		Rect2(at - size * 0.12, size * 1.24),
+		Color(exit_color, 0.20 * strength)
+	)
+	draw_rect(
+		Rect2(at + size * 0.18, size * 0.64),
+		Color(exit_color, lerpf(strength, 1.0, amount))
+	)
