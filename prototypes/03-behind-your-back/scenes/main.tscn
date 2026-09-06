@@ -1,0 +1,240 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1_player"]
+[ext_resource type="PackedScene" path="res://scenes/mutable_platform.tscn" id="2_platform"]
+[ext_resource type="Script" path="res://scripts/waypoint.gd" id="3_waypoint"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="4_checkpoint"]
+[ext_resource type="Shader" path="res://shaders/gaze.gdshader" id="5_gaze"]
+[ext_resource type="Script" path="res://scripts/debug_overlay.gd" id="6_debug"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_start"]
+size = Vector2(340, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_end"]
+size = Vector2(300, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mid"]
+size = Vector2(240, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_goal"]
+size = Vector2(340, 50)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_beacon"]
+size = Vector2(300, 50)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_checkpoint"]
+size = Vector2(240, 50)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gaze"]
+shader = ExtResource("5_gaze")
+shader_parameter/strength = 0.55
+shader_parameter/inner = 0.55
+shader_parameter/outer = 1.1
+shader_parameter/aspect = Vector2(1, 0.5625)
+
+[node name="Main" type="Node2D"]
+
+[node name="StartLedge" type="StaticBody2D" parent="."]
+position = Vector2(180, 620)
+collision_layer = 1
+collision_mask = 0
+
+[node name="ColorRect" type="ColorRect" parent="StartLedge"]
+offset_left = -170.0
+offset_top = -40.0
+offset_right = 170.0
+offset_bottom = 40.0
+color = Color(0.24, 0.2, 0.36, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StartLedge"]
+shape = SubResource("RectangleShape2D_start")
+
+[node name="EndLedge" type="StaticBody2D" parent="."]
+position = Vector2(3760, 620)
+collision_layer = 1
+collision_mask = 0
+
+[node name="ColorRect" type="ColorRect" parent="EndLedge"]
+offset_left = -150.0
+offset_top = -40.0
+offset_right = 150.0
+offset_bottom = 40.0
+color = Color(0.24, 0.2, 0.36, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EndLedge"]
+shape = SubResource("RectangleShape2D_end")
+
+[node name="MidLedge" type="StaticBody2D" parent="."]
+position = Vector2(1840, 560)
+collision_layer = 1
+collision_mask = 0
+
+[node name="ColorRect" type="ColorRect" parent="MidLedge"]
+offset_left = -120.0
+offset_top = -20.0
+offset_right = 120.0
+offset_bottom = 20.0
+color = Color(0.3, 0.27, 0.42, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MidLedge"]
+shape = SubResource("RectangleShape2D_mid")
+
+[node name="MidCheckpoint" type="Area2D" parent="."]
+position = Vector2(1840, 505)
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("4_checkpoint")
+
+[node name="ColorRect" type="ColorRect" parent="MidCheckpoint"]
+offset_left = -120.0
+offset_top = -25.0
+offset_right = 120.0
+offset_bottom = 25.0
+color = Color(0.35, 0.85, 0.75, 0.35)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MidCheckpoint"]
+shape = SubResource("RectangleShape2D_checkpoint")
+
+[node name="Goal" type="Area2D" parent="."]
+position = Vector2(180, 545)
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("3_waypoint")
+role = 1
+color_idle = Color(1, 0.85, 0.35, 0.25)
+color_active = Color(1, 0.85, 0.35, 0.85)
+
+[node name="ColorRect" type="ColorRect" parent="Goal"]
+offset_left = -170.0
+offset_top = -25.0
+offset_right = 170.0
+offset_bottom = 25.0
+color = Color(1, 0.85, 0.35, 0.08)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Goal"]
+shape = SubResource("RectangleShape2D_goal")
+
+[node name="Beacon" type="Area2D" parent="."]
+position = Vector2(3760, 545)
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("3_waypoint")
+role = 0
+
+[node name="ColorRect" type="ColorRect" parent="Beacon"]
+offset_left = -150.0
+offset_top = -25.0
+offset_right = 150.0
+offset_bottom = 25.0
+color = Color(0.35, 0.85, 0.75, 0.25)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Beacon"]
+shape = SubResource("RectangleShape2D_beacon")
+
+[node name="P00" parent="." instance=ExtResource("2_platform")]
+position = Vector2(430, 560)
+size = Vector2(150, 24)
+color = Color(0.95, 0.42, 0.72, 1)
+variants = PackedVector2Array(0, 0, 18, -40, -12, 40)
+[node name="P01" parent="." instance=ExtResource("2_platform")]
+position = Vector2(665, 560)
+size = Vector2(150, 24)
+color = Color(0.42, 0.78, 0.98, 1)
+variants = PackedVector2Array(0, 0, 12, -32, 18, 40)
+[node name="P02" parent="." instance=ExtResource("2_platform")]
+position = Vector2(900, 560)
+size = Vector2(150, 24)
+color = Color(0.62, 0.95, 0.45, 1)
+variants = PackedVector2Array(0, 0, -18, -40, 12, 40)
+[node name="P03" parent="." instance=ExtResource("2_platform")]
+position = Vector2(1135, 560)
+size = Vector2(150, 24)
+color = Color(1.0, 0.66, 0.29, 1)
+variants = PackedVector2Array(0, 0, -12, -32, -12, 40)
+[node name="P04" parent="." instance=ExtResource("2_platform")]
+position = Vector2(1370, 560)
+size = Vector2(150, 24)
+color = Color(0.72, 0.55, 0.98, 1)
+variants = PackedVector2Array(0, 0, 18, -25, 18, 32)
+[node name="P05" parent="." instance=ExtResource("2_platform")]
+position = Vector2(1605, 560)
+size = Vector2(150, 24)
+color = Color(0.98, 0.85, 0.35, 1)
+variants = PackedVector2Array(0, 0, -12, -32, -12, 32)
+[node name="P07" parent="." instance=ExtResource("2_platform")]
+position = Vector2(2075, 560)
+size = Vector2(150, 24)
+color = Color(0.98, 0.5, 0.45, 1)
+variants = PackedVector2Array(0, 0, 18, -25, 12, 25)
+[node name="P08" parent="." instance=ExtResource("2_platform")]
+position = Vector2(2310, 560)
+size = Vector2(150, 24)
+color = Color(0.55, 0.7, 0.98, 1)
+variants = PackedVector2Array(0, 0, -18, -25, -12, 25)
+[node name="P09" parent="." instance=ExtResource("2_platform")]
+position = Vector2(2545, 560)
+size = Vector2(150, 24)
+color = Color(0.85, 0.95, 0.5, 1)
+variants = PackedVector2Array(0, 0, 0, -25, -18, 25)
+[node name="P10" parent="." instance=ExtResource("2_platform")]
+position = Vector2(2780, 560)
+size = Vector2(150, 24)
+color = Color(0.98, 0.62, 0.85, 1)
+variants = PackedVector2Array(0, 0, 18, -32, 12, 32)
+[node name="P11" parent="." instance=ExtResource("2_platform")]
+position = Vector2(3015, 560)
+size = Vector2(150, 24)
+color = Color(0.5, 0.88, 0.6, 1)
+variants = PackedVector2Array(0, 0, 12, -25, 18, 32)
+[node name="P12" parent="." instance=ExtResource("2_platform")]
+position = Vector2(3250, 560)
+size = Vector2(150, 24)
+color = Color(0.9, 0.75, 0.98, 1)
+variants = PackedVector2Array(0, 0, 0, -32, -18, 25)
+[node name="P13" parent="." instance=ExtResource("2_platform")]
+position = Vector2(3485, 560)
+size = Vector2(150, 24)
+color = Color(0.6, 0.95, 0.9, 1)
+variants = PackedVector2Array(0, 0, 12, -40, -12, 25)
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(140, 540)
+fall_threshold_y = 900.0
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+position_smoothing_speed = 6.0
+limit_left = 0
+limit_top = -280
+limit_right = 3960
+limit_bottom = 900
+
+[node name="Hud" type="CanvasLayer" parent="."]
+
+[node name="Gaze" type="ColorRect" parent="Hud"]
+material = SubResource("ShaderMaterial_gaze")
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
+
+[node name="Help" type="Label" parent="Hud"]
+offset_left = 24.0
+offset_top = 20.0
+offset_right = 780.0
+offset_bottom = 110.0
+theme_override_colors/font_color = Color(0.78, 0.75, 0.88, 1)
+theme_override_font_sizes/font_size = 18
+text = "A/D or arrows = run    SPACE = jump    R = respawn
+Reach the teal beacon at the far end, then come back to the start.
+Nothing ever moves while you can see it."
+
+[node name="Debug" type="Label" parent="Hud"]
+offset_left = 900.0
+offset_top = 130.0
+offset_right = 1260.0
+offset_bottom = 340.0
+theme_override_colors/font_color = Color(0.55, 0.85, 0.8, 1)
+theme_override_font_sizes/font_size = 15
+script = ExtResource("6_debug")
+gaze_path = NodePath("../Gaze")
+player_path = NodePath("../../Player")

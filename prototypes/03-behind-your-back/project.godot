@@ -1,0 +1,33 @@
+; Engine configuration file.
+; Prototype 03 — behind your back.
+; Open THIS folder as the Godot project.
+
+config_version=5
+
+[application]
+
+config/name="03 - Behind Your Back"
+config/description="The level rearranges itself, but only where the camera cannot see it. What is on screen is always true."
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.7", "Forward Plus")
+
+[autoload]
+
+Controls="*res://scripts/controls.gd"
+Observer="*res://scripts/observer.gd"
+Run="*res://scripts/run_state.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[physics]
+
+2d/default_gravity=1250.0
+
+[rendering]
+
+environment/defaults/default_clear_color=Color(0.08, 0.06, 0.13, 1)

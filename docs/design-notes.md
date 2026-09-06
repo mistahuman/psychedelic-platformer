@@ -178,6 +178,14 @@ The shader route (warp the whole frame) is the obvious reading of
   passthrough, llvmpipe software rendering), and a stuttering prototype poisons
   a feel test for reasons that have nothing to do with design.
 
+> **Correction, 2026-09-06.** That second reason was wrong, or has stopped being
+> true. The machine is native Ubuntu 24.04 on Wayland with an AMD Radeon 780M:
+> Mesa radeonsi, OpenGL 4.6, and Vulkan 1.4 / Forward+ both verified running.
+> There is no WSLg and no llvmpipe. The shader budget that argument spent does
+> not need spending — prototype 03 runs on Forward+ and leaves its full-screen
+> pass on by default. The *first* reason still stands on its own, and it is the
+> better one: a uniform lie teaches the player nothing.
+
 Offsetting the visuals costs nothing, and lies about exactly one thing — where
 a platform is — which is the thing the player has to reason about. The
 full-screen shader (`shaders/haze.gdshader`, warp + chromatic aberration, three
@@ -213,3 +221,262 @@ character controller is settled; it is not what these prototypes are testing.
   currently is) or would randomness be better? Current bet: learnable.
 - Should the player's own body drift too? Current bet: no — losing trust in your
   own position is the fastest way to make a platformer unplayable.
+
+---
+
+## Prototype 03 — Behind your back
+
+**Question:** when the level rearranges itself only where you cannot see it, is
+turning around tension — or just annoyance?
+
+### Why 02 was set aside before being played
+
+Called on 2026-09-06, at the desk rather than on the pad, and worth recording as
+a judgement rather than a verdict: **02's calm mechanic does not change the
+world, it changes your reading of the world.** Mechanically its level is four
+`StaticBody2D` that never move. The calm is a meter you manage, and "stand still
+and the truth returns" is fiction laid on top of a resource, not a thing the
+level does. That is the sense in which it is self-contained: it cannot grow into
+anything, because nothing in the world is at stake.
+
+02 is left in the repo, built and unplayed. If it is ever played, the thing to
+find out is whether the calm gets *used* — that answer would still be worth
+having, and it is cheap now that Godot runs locally.
+
+### What "the world changes" was narrowed to
+
+Four readings were on the table: the world reacts to your passage; it changes
+where you are not looking; two overlaid worlds you switch between; platforms that
+exist intermittently. **Picked: changes where you are not looking.**
+
+The reason it beats the others for this project specifically: it is the only one
+that **keeps the screen honest**. 01 moved the geometry, 02 moved the picture of
+the geometry and lied. Both spend the player's trust. This one spends none — what
+is rendered is always exactly what you will collide with — and puts the
+instability entirely in what you remember. For a game whose working title
+promises unreliability, buying that unreliability without ever cheating the
+player in the moment is the more interesting trade.
+
+### The camera is no longer undecided
+
+01 and 02 both left this open and both ran on a single fixed screen. "Off camera"
+is meaningless on a fixed screen, so 03 settles it by force:
+
+- **Horizontally scrolling `Camera2D`,** child of the player, `limit_*` set to
+  the level bounds, `position_smoothing_speed = 6.0`.
+- The corridor is **~3 screens wide** and is crossed **twice**: out to a beacon,
+  back to a goal that stays dark until the beacon is touched. Backtracking is not
+  a level-design flourish here, it is the only way the mechanic is ever
+  experienced. A single crossing would be a plain platformer.
+
+### The rule, precisely
+
+- A platform holds one of several **variants**: offsets from its editor position.
+  Index 0 is the authored one, so the level as designed is the level as first
+  seen.
+- It may re-roll **only while entirely outside the camera rect grown by a margin**
+  (default 160 px), and **at most once per trip off screen** — it arms itself
+  when visible and disarms when it rolls. Without the arming it would keep
+  shuffling in place while the player is elsewhere, which is a different and much
+  cheaper mechanic.
+- The **destination is checked too, not just the origin.** A platform sitting just
+  past the margin can pick an offset that lands it back inside the view; that
+  would be a visible pop, the one thing the prototype promises never happens. If
+  the destination is visible, it does not move.
+- `mutation_chance` defaults to **0.6**, not 1.0. The platforms that stay put are
+  landmarks. Without them the return leg reads as a *different level* rather than
+  as *the same level, changed*, and the whole effect collapses into a random
+  level generator. This is the knob most likely to be wrong.
+
+The view rect comes from the **camera**, not the player: with position smoothing
+the two disagree for a fraction of a second, and that fraction is exactly where a
+platform would be caught moving. Note also that `get_visible_rect()` on the
+viewport is the correct source — `get_viewport_rect()` on the camera is a
+`CanvasItem` helper and reported a square rect.
+
+### Level arithmetic
+
+The variants have to stay inside the jump, or the world can rearrange itself into
+an impassable corridor and the prototype tests frustration instead of tension.
+From the settled controller (`jump_velocity` 520, rise gravity 1250, fall gravity
+1750, `max_speed` 280):
+
+- apex **108 px**, reached at 0.416 s; total airtime back to the same height
+  0.767 s, so a flat gap allows about **215 px** of travel.
+- for a landing **80 px higher**, the arc is above that line between t = 0.204 s
+  and t = 0.596 s — a horizontal budget of **167 px**.
+- the layout spends at most **149 px** of it: 85 px of gap (150 px platforms on a
+  235 px pitch), plus 36 px worst-case horizontal variant offset, plus the 28 px
+  of player width between the two landing edges.
+
+Hence the variant envelope: **±40 px vertical, ±18 px horizontal**, and all bases
+on the same `y`. Every base at the same height also means that with mutation off
+(`F3`) the level is a flat, boring row — **the level's shape is entirely the
+product of the mechanic**, which makes the A/B test honest.
+
+A static grey ledge sits halfway, never mutates, and carries a checkpoint. It is
+the landmark and the breather, and it keeps a fall on the return leg from costing
+the whole leg.
+
+### Measurement
+
+`run_state.gd` times both legs separately and the overlay shows them. That is the
+data the verdict needs: a slower return is expected, but slower-because-careful
+and slower-because-waiting are opposite answers to the question, and the timer
+plus the memory of the run distinguishes them.
+
+### The gaze edge
+
+`shaders/gaze.gdshader` is a cheap vignette on a `CanvasLayer`, **on by default**
+— unlike 02's haze, which was off. The screen border is where the rules change in
+this prototype, so being able to feel it is mechanical, not decorative. It costs
+one `length()` per pixel and the machine turned out to have a real GPU (see the
+correction under 02), so there is no reason to hide it behind a toggle other than
+the A/B, which `F2` provides.
+
+### To evaluate in playtesting
+
+- `F3` across the return leg. Mutation off is the same corridor twice, boring on
+  purpose. Is on *tense* or *tiring*?
+- Does the player start **walking backwards to keep the level in view**? If so
+  the mechanic works — and that instinct is a verb a full game would have to
+  make real rather than merely tolerate.
+- Unexpected landing: "huh, it moved" or "what, again"?
+- `mutation_chance` at 1.0: does the "same level, changed" reading survive?
+- `margin` towards 0: how obvious does the cheat have to get before it is felt?
+
+### Open
+
+- **Random or learnable?** Currently a fresh random roll each time. 02 bet on
+  learnable and never got tested. Here randomness is arguably right — the point is
+  discovery on return, not pattern memorisation — but a fixed per-platform
+  sequence would make mastery possible. Untested either way.
+- **Disappearing platforms** were deliberately left out. They are the most
+  striking version of "the world changed", but guaranteeing the corridor stays
+  crossable stops being arithmetic and starts being a solver. One question per
+  prototype.
+- Vertical space is unused. The corridor is a horizontal line; the mechanic has
+  nothing to say about it yet.
+
+---
+
+## Prototype 04 — Remembered maze
+
+**Question:** if almost everything is always unseen, does "the world changed"
+stop being noticeable at all?
+
+### Why a maze, and why this is not a new question
+
+03's rule was kept; only the vehicle changed. In a corridor, "what you cannot
+see" is just "what is off screen": a small set, emptied by walking. A maze
+supplies blind space for free — every corner is one, two steps away — and the
+getting lost and the doubling back that 03 had to manufacture with a beacon and a
+goal are native to the form.
+
+The cost is that this is no longer a platformer. `player.gd` does not carry: no
+gravity, no jump, no floor. `walker.gd` replaces it, with a **circle** collision
+shape, because a box catches on every corner of a 48 px grid and makes the maze
+feel worse than it is. Whether the project as a whole is still a platformer is a
+question for after the verdict, not before it.
+
+### The risk this prototype accepts
+
+A short lantern means nearly the whole maze is always eligible to change. Taken
+alone that is the same failure as setting 03's `mutation_chance` to 1.0, in a
+harsher form: **a world that changes everywhere is indistinguishable from a world
+with no rules.** If the player cannot notice a change, the change may as well not
+happen, and the mechanic evaporates into atmosphere.
+
+### The answer to it: memory is drawn
+
+Three layers, deliberately kept apart in `maze.gd`:
+
+```
+cells    what the maze actually is. Collision agrees with this, always.
+memory   what the player last SAW. Only ever updated by looking.
+light    how brightly each cell is lit this frame, 0..1.
+```
+
+Unlit-but-visited cells are drawn **from `memory`**, dimmed. Lit cells are drawn
+from `cells`. That single substitution in `maze_view.gd` is the mechanic: the
+map in your head is on the screen, it is stale, and it stays stale until you walk
+back and look. The change becomes noticeable not because it is signposted but
+because **you are holding the old version in your hand while you find the new
+one.**
+
+Nothing marks a stale cell. `F4` does, for testing only — it gives the answer
+away and must not become a feature by accident.
+
+`stale_count()` — cells whose memory disagrees with truth — is surfaced in the
+overlay as `wrong`. It is the closest thing this prototype has to a measurement:
+how much of what the player believes is false at this instant.
+
+### Connectivity is checkable, unlike a jump arc
+
+03 had to guarantee traversability by arithmetic, hand-tuning the variant
+envelope against the jump arc so no combination could produce an impossible gap.
+A maze does not need that: **propose the change, flood fill, keep it only if the
+exit is still reachable from the cell the player is standing in.** The grid is
+23x13, so a BFS per attempted change is free.
+
+This is a better shape for the same problem, and worth remembering if the
+mechanic survives: prefer worlds whose validity can be *tested* over worlds whose
+validity has to be *proven in advance*.
+
+Two further filters, both load-bearing:
+
+- A cell must be **unlit and at least `min_distance` cells away**. Unlit alone is
+  not enough — changes happening just past the lantern read as being done *at*
+  you rather than behind you.
+- **Wall density is held at the value it was generated with.** Each attempt
+  prefers opening if the maze has drifted denser and closing if it has drifted
+  sparser. Without it a long run erodes into an open field or silts up into a
+  block; either way the maze stops being a maze.
+
+Most attempts are rejected, and that is the design. The filters are what separate
+this from a random level generator.
+
+### Generation
+
+Recursive backtracker on odd coordinates: a perfect maze, exactly one route
+between any two cells. Mutation erodes that property immediately — opening a wall
+creates a loop — and that is fine. Perfection is the starting condition, not an
+invariant. The invariant is connectivity, and it is checked per change.
+
+### Bug worth recording: node exports in hand-written scenes
+
+`@export var maze: Node2D` with `maze = NodePath("..")` written by hand into the
+`.tscn` **does not resolve** — the property stays null, silently. The view drew
+nothing and the overlay rendered an empty string, with no error anywhere.
+
+**Prototype 03 had the same bug and it went unnoticed**: its `F2` (gaze edge) and
+`F5` (restart run) did nothing at all. Both are now fixed the way `maze.gd`
+already did it for the player: export a `NodePath` and resolve it with
+`get_node_or_null()` in `_ready()`.
+
+Convention from here: in a hand-authored scene, **export paths, not nodes.**
+
+### To evaluate in playtesting
+
+- Does the drawn memory actually do its job — do you *catch* the maze having
+  moved, or does it read as arbitrary?
+- `F3` off. A static maze with a small lantern is already tense. Is the mutation
+  adding tension, or only adding time?
+- Walking into a wall your map denies: discovery, or bug? If it reads as a bug,
+  this fails and it is worth knowing early.
+- `[` and `]`. There is a lantern radius at which memory stops being useful and
+  one at which mutation stops being felt. The design lives between them, and
+  finding that band is most of what this playtest is for.
+- Does the exit ever *feel* unreachable? It never is. Feeling trapped and being
+  trapped are different, and only the first one matters here.
+
+### Open
+
+- **No line-of-sight memory of *when*.** Every remembered cell looks equally
+  fresh. Fading memory by age would tell the player where to distrust — probably
+  too helpful, but it is the obvious next knob.
+- The maze is one screen. Scrolling would make the unseen set much larger and is
+  the natural place to go if the lantern radius turns out to want to be small.
+- No reason to walk back yet. 03 manufactured one; here backtracking happens only
+  when you hit a dead end. If the verdict is "did not notice", the first thing to
+  try is a there-and-back objective, not a bigger lantern.
