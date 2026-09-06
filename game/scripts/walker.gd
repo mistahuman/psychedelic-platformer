@@ -9,6 +9,12 @@ extends CharacterBody2D
 
 var frozen := true
 
+## Steps are paced by distance covered, not by a timer, so they stay in step
+## with the character when it accelerates and decelerates.
+const STEP_DISTANCE := 38.0
+var _since_step := 0.0
+var _left_foot := true
+
 
 func _physics_process(delta: float) -> void:
 	if frozen:
@@ -21,3 +27,17 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity = velocity.move_toward(direction * max_speed, acceleration * delta)
 	move_and_slide()
+	_footsteps(delta)
+
+
+func _footsteps(delta: float) -> void:
+	_since_step += velocity.length() * delta
+	if _since_step < STEP_DISTANCE:
+		return
+	_since_step = 0.0
+	_left_foot = not _left_foot
+	Sound.play(
+		&"step_a" if _left_foot else &"step_b",
+		-13.0,
+		randf_range(0.94, 1.07)
+	)

@@ -17,7 +17,10 @@ Any key to start. `WASD` or arrows to walk. `R` to go back in.
 | Dim walls | remembered from earlier — may already be wrong |
 | A cell flashing pink | the lantern just caught your memory being wrong |
 | Amber pulse | oil: it buys wick back |
-| Teal pulse in the corner | the door |
+| Teal pulse in the corner | the door — visible from anywhere, and it hums |
+
+Play it with sound on. The maze getting away with something has its own noise,
+and the wick running low starts a heartbeat before the bar looks alarming.
 
 A run takes two or three minutes.
 
@@ -41,6 +44,16 @@ make game           # from the repo root
 ```
 
 or `godot --path game`.
+
+## Sound
+
+Every sound is generated from sine waves, filtered noise and envelopes by
+[`../tools/make_sounds.py`](../tools/make_sounds.py) — no sourced assets. Re-run
+it to re-tune them:
+
+```bash
+python3 tools/make_sounds.py
+```
 
 ## Where this came from
 

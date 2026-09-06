@@ -31,6 +31,7 @@ func _ready() -> void:
 	if _maze:
 		_maze.reached_exit.connect(_on_escaped)
 		_maze.found_oil.connect(_on_oil)
+		_maze.was_fooled.connect(_on_fooled)
 	_enter(State.TITLE)
 
 
@@ -41,6 +42,9 @@ func _process(delta: float) -> void:
 	seconds_left -= delta
 	if _maze:
 		_maze.wick = clampf(seconds_left / WICK_SECONDS, 0.0, 1.0)
+	# The heartbeat is the only warning the wick gives. No number, no bar colour
+	# change that you have to be looking at — a sound that starts.
+	Sound.loop(&"heartbeat", wick_ratio() < 0.28, -11.0)
 	if seconds_left <= 0.0:
 		seconds_left = 0.0
 		_enter(State.BURNT_OUT)
@@ -88,17 +92,29 @@ func wick_ratio() -> float:
 
 func _on_escaped() -> void:
 	_enter(State.ESCAPED)
+	Sound.play(&"escaped", -4.0)
+
+
+func _on_fooled(_total: int) -> void:
+	Sound.play(&"caught", -6.0, randf_range(0.97, 1.04))
 
 
 func _on_oil(_remaining: int) -> void:
 	oil_taken += 1
+	Sound.play(&"oil", -7.0)
 	# Capped at the starting wick: oil buys you back time, it does not let you
 	# hoard a lantern brighter than the one you began with.
 	seconds_left = minf(seconds_left + OIL_SECONDS, WICK_SECONDS)
 
 
 func _enter(next: State) -> void:
+	var was := state
 	state = next
+	Sound.loop(&"drone", state == State.PLAYING, -13.0)
+	if state != State.PLAYING:
+		Sound.loop(&"heartbeat", false)
+	if state == State.BURNT_OUT and was == State.PLAYING:
+		Sound.play(&"burnt_out", -3.0)
 	if _maze:
 		_maze.running = state == State.PLAYING
 	if _player:

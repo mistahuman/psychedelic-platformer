@@ -79,6 +79,7 @@ var wick := 1.0
 
 var _player: Node2D
 var _walls: StaticBody2D
+var _door: AudioStreamPlayer2D
 var _shapes := {}
 var _debt := 0.0
 var _clock := 0.0
@@ -92,6 +93,16 @@ func _ready() -> void:
 	_walls.collision_layer = 1
 	_walls.collision_mask = 0
 	add_child(_walls)
+	# The door hums, positionally. Between the glow and the hum the objective is
+	# knowable from anywhere in the maze — being lost is meant to be about the
+	# route, never about which way is out.
+	_door = AudioStreamPlayer2D.new()
+	_door.stream = Sound.door_stream()
+	_door.volume_db = -12.0
+	_door.max_distance = 900.0
+	_door.attenuation = 1.6
+	_door.position = cell_center(exit_cell) - global_position
+	add_child(_door)
 	rebuild()
 
 
@@ -120,6 +131,8 @@ func rebuild() -> void:
 		_player.global_position = cell_center(start_cell)
 		if _player is CharacterBody2D:
 			(_player as CharacterBody2D).velocity = Vector2.ZERO
+	if _door and not _door.playing:
+		_door.play()
 	_look()
 
 
