@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/drifting_platform.gd" id="1_platform"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform"]
+size = Vector2(120, 24)
+
+[node name="DriftingPlatform" type="StaticBody2D"]
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_platform")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_left = -60.0
+offset_top = -12.0
+offset_right = 60.0
+offset_bottom = 12.0
+color = Color(0.95, 0.42, 0.72, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_platform")

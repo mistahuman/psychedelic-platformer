@@ -144,3 +144,72 @@ Candidates that move it elsewhere:
   than the world.
 
 Undecided regardless of direction: camera (a single fixed screen for now).
+
+---
+
+## Prototype 02 — Unreliable vision
+
+**Question:** when the rendering lies about where the geometry is, is that a
+mechanic you can learn to play against, or just noise that makes the game feel
+broken?
+
+Direct answer to 01's verdict: the oscillation moves from the level geometry to
+the *image* of the level geometry.
+
+### The mechanic
+
+- Platforms are `StaticBody2D`. **The collision shapes never move.**
+- Each platform's `ColorRect` is offset from the real position by a per-platform
+  two-axis sine, scaled by a global `Perception.level` (0..1).
+- `Perception.level` rises while the player moves or is airborne, and falls
+  roughly 2.7x faster while the player stands still on the ground.
+
+So: moving costs you information, standing still buys it back. The player can
+always get the truth — at the price of time. That's the loop worth testing;
+without the calm mechanic this would just be a screen effect.
+
+### Why visual offset rather than a screen-space shader
+
+The shader route (warp the whole frame) is the obvious reading of
+"psychedelic", but it's the weaker test:
+
+- It lies about *everything* uniformly, so there's nothing specific to learn.
+- Full-screen fragment work is expensive on the target setup (WSLg, no GPU
+  passthrough, llvmpipe software rendering), and a stuttering prototype poisons
+  a feel test for reasons that have nothing to do with design.
+
+Offsetting the visuals costs nothing, and lies about exactly one thing — where
+a platform is — which is the thing the player has to reason about. The
+full-screen shader (`shaders/haze.gdshader`, warp + chromatic aberration, three
+texture samples) is there as flavor on top, **off by default**, toggled with F2.
+
+`BackBufferCopy` in `copy_mode = 2` sits before the haze `ColorRect` so
+`hint_screen_texture` is populated regardless of renderer.
+
+### In-game debug overlay
+
+Prototype 01's tuning plan relied on the editor's Remote inspector, which turned
+out to be awkward in practice: under WSLg the game and the editor are separate X
+windows, keyboard focus has to be switched by hand, and the tab is easy to miss.
+Replaced with an in-game overlay and function keys (`scripts/debug_overlay.gd`).
+**Convention from here on: prototypes tune themselves, no editor round-trip.**
+
+### Carried over from 01
+
+`player.gd` unchanged except for one line feeding `Perception.calm`. The
+character controller is settled; it is not what these prototypes are testing.
+
+### To evaluate in playtesting
+
+- F3 (drift on/off) mid-run: is the difference interesting, or just annoying?
+- Does the player actually stop to read the level? If the calm mechanic goes
+  unused, it doesn't exist and the whole design collapses to a screen effect.
+- Does a missed jump feel like being tricked (good) or cheated (bad)?
+- Where is the line, on `]`, between disorienting and unplayable?
+
+### Open
+
+- Does the lie need to be *learnable* (a fixed pattern per platform, which it
+  currently is) or would randomness be better? Current bet: learnable.
+- Should the player's own body drift too? Current bet: no — losing trust in your
+  own position is the fastest way to make a platformer unplayable.

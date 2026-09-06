@@ -1,0 +1,34 @@
+; Engine configuration file.
+; Prototype 02 — unreliable vision.
+; Open THIS folder as the Godot project.
+
+config_version=5
+
+[application]
+
+config/name="02 - Unreliable Vision"
+config/description="Static geometry, drifting rendering. What you see is not where it is — unless you stand still."
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+
+[autoload]
+
+Controls="*res://scripts/controls.gd"
+Perception="*res://scripts/perception.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[physics]
+
+2d/default_gravity=1250.0
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.07, 0.05, 0.12, 1)

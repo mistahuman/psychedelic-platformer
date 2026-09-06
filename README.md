@@ -26,6 +26,7 @@ prototype folder (not the repo root) → **Run** (F5).
 | # | Folder | Question | Verdict |
 |---|---|---|---|
 | 01 | [`01-breathing-platforms`](prototypes/01-breathing-platforms/) | Is jumping on oscillating platforms fun or frustrating? | Fine to play, wrong direction — closed |
+| 02 | [`02-unreliable-vision`](prototypes/02-unreliable-vision/) | Is rendering that lies about the geometry a mechanic, or just noise? | untested |
 
 ## Conventions
 
@@ -33,7 +34,9 @@ prototype folder (not the repo root) → **Run** (F5).
   the feel is settled.
 - Each prototype is **one playable scene**. No menus, no level system, no game
   over.
-- Every feel parameter is an `@export`, tunable from the inspector **while the
-  game runs**.
+- Every feel parameter is an `@export`, tunable **while the game runs** — from
+  prototype 02 on, through in-game debug keys rather than the editor's Remote
+  inspector.
+- **No audio.** Out of scope until a core mechanic is settled.
 - Decisions go in [`docs/design-notes.md`](docs/design-notes.md), not in commit
   messages.
