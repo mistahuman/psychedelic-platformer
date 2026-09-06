@@ -1,0 +1,33 @@
+; Engine configuration file.
+; Prototype 01 — breathing platforms.
+; Open THIS folder as the Godot project.
+
+config_version=5
+
+[application]
+
+config/name="01 - Breathing Platforms"
+config/description="Minimal prototype: classic platformer movement + platforms oscillating on a sine wave."
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.3", "GL Compatibility")
+
+[autoload]
+
+Controls="*res://scripts/controls.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[physics]
+
+2d/default_gravity=1250.0
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.08, 0.06, 0.13, 1)

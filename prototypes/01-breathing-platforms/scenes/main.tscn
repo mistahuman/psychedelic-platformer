@@ -1,0 +1,111 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1_player"]
+[ext_resource type="PackedScene" path="res://scenes/breathing_platform.tscn" id="2_platform"]
+[ext_resource type="Script" path="res://scripts/checkpoint.gd" id="3_checkpoint"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_start"]
+size = Vector2(320, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_end"]
+size = Vector2(260, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_checkpoint"]
+size = Vector2(260, 60)
+
+[node name="Main" type="Node2D"]
+
+[node name="StartLedge" type="StaticBody2D" parent="."]
+position = Vector2(140, 620)
+collision_layer = 1
+collision_mask = 0
+
+[node name="ColorRect" type="ColorRect" parent="StartLedge"]
+offset_left = -160.0
+offset_top = -40.0
+offset_right = 160.0
+offset_bottom = 40.0
+color = Color(0.24, 0.2, 0.36, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StartLedge"]
+shape = SubResource("RectangleShape2D_start")
+
+[node name="EndLedge" type="StaticBody2D" parent="."]
+position = Vector2(1160, 620)
+collision_layer = 1
+collision_mask = 0
+
+[node name="ColorRect" type="ColorRect" parent="EndLedge"]
+offset_left = -130.0
+offset_top = -40.0
+offset_right = 130.0
+offset_bottom = 40.0
+color = Color(0.24, 0.2, 0.36, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EndLedge"]
+shape = SubResource("RectangleShape2D_end")
+
+[node name="Checkpoint" type="Area2D" parent="."]
+position = Vector2(1160, 550)
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("3_checkpoint")
+
+[node name="ColorRect" type="ColorRect" parent="Checkpoint"]
+offset_left = -130.0
+offset_top = -30.0
+offset_right = 130.0
+offset_bottom = 30.0
+color = Color(0.35, 0.85, 0.75, 0.35)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint"]
+shape = SubResource("RectangleShape2D_checkpoint")
+
+[node name="PlatformA" parent="." instance=ExtResource("2_platform")]
+position = Vector2(380, 560)
+size = Vector2(140, 24)
+color = Color(0.95, 0.42, 0.72, 1)
+amplitude = 55.0
+frequency = 0.33
+phase_offset = 0.0
+
+[node name="PlatformB" parent="." instance=ExtResource("2_platform")]
+position = Vector2(570, 480)
+size = Vector2(130, 24)
+color = Color(0.42, 0.78, 0.98, 1)
+amplitude = 85.0
+frequency = 0.22
+phase_offset = 1.7
+
+[node name="PlatformC" parent="." instance=ExtResource("2_platform")]
+position = Vector2(760, 540)
+size = Vector2(120, 24)
+color = Color(0.62, 0.95, 0.45, 1)
+amplitude = 60.0
+frequency = 0.45
+phase_offset = 3.1
+
+[node name="PlatformD" parent="." instance=ExtResource("2_platform")]
+position = Vector2(950, 450)
+size = Vector2(130, 24)
+color = Color(1, 0.66, 0.29, 1)
+amplitude = 45.0
+frequency = 0.58
+phase_offset = 4.8
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(110, 520)
+fall_threshold_y = 780.0
+
+[node name="Hud" type="CanvasLayer" parent="."]
+
+[node name="Help" type="Label" parent="Hud"]
+offset_left = 24.0
+offset_top = 20.0
+offset_right = 624.0
+offset_bottom = 120.0
+theme_override_colors/font_color = Color(0.78, 0.75, 0.88, 1)
+theme_override_font_sizes/font_size = 18
+text = "A/D or arrows = run    SPACE = jump    R = respawn
+Fall off the bottom -> back to the last safe point.
+Goal: cross the 4 breathing platforms."
