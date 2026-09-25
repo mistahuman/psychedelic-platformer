@@ -2,8 +2,8 @@
 
 Godot 4 / GDScript. Right now this is **a prototype repo**:
 
-- **`prototypes/`** — five closed attempts, kept as a record, and **06 grapple**, the
-  one being tested. 05 Wick was built as "the game" in `game/`, played, not liked,
+- **`prototypes/`** — closed attempts kept as a record, and **07 song surf**, the one
+  being tested: your own songs turned into terrain. 05 Wick was built as "the game" in `game/`, played, not liked,
   and demoted on 2026-09-25.
 - **`game/`** — does not exist at the moment. It comes back when an idea earns it.
 
@@ -62,6 +62,10 @@ radeonsi, OpenGL 4.6, and Vulkan 1.4 / Forward+ both verified. The WSLg + llvmpi
 software-rendering constraint recorded in 01 and 02 does not apply — 01 and 02 are on
 GL Compatibility for historical reasons, 03 is on Forward+ and leaves its full-screen
 shader on by default. **Do not carry that constraint into new prototypes.**
+
+**With the session locked** (e.g. while driven over remote control), Godot windows
+stop getting frames on Wayland and hang, even with `--quit-after`. Add
+`--disable-vsync` for screenshots or real-time audio checks.
 
 Prototypes can be smoke-tested without a window:
 `godot --headless --path prototypes/NN-slug --quit` runs one frame and surfaces every
@@ -161,4 +165,9 @@ screen — there the lantern, not the camera, is what bounds sight.
   A headless bot (`tools/course_bot.gd`) confirmed the course is passable and that
   only some release angles work.
 
-Next: name what 06 is missing before adding anything.
+- 07 song surf — built 2026-09-25 after an image-first brainstorm, **untested.**
+  The one hook that got a strong reaction was "your own songs". `songs/` is
+  gitignored — songs are analysed locally by `tools/analyse_song.py` and never
+  committed. Tuned by a bot until skill mattered: dead water ahead, no push.
+
+Next: play 07 with a song you love.

@@ -4,6 +4,7 @@ _(working title)_
 
 A 2D game in Godot 4 — a platformer up to prototype 03, top-down from 04 to 05,
 side view again from 06.
+07 turns your own songs into terrain.
 Prototype repo: each folder under `prototypes/` is a standalone Godot project,
 playable in a couple of minutes, built to answer one design question. The final
 game does not exist yet — it gets assembled from the mechanics that survive.
@@ -16,8 +17,8 @@ Godot 4.7 · GDScript
 
 ```bash
 make list             # the prototypes and their questions
-make run P=06         # open the prototype in Godot
-make edit P=06        # open it in the editor
+make run P=07         # open the prototype in Godot
+make edit P=07        # open it in the editor
 ```
 
 Needs Godot 4.7 on `PATH`, or `GODOT=/path/to/godot`. Without `make`: in Godot,
@@ -33,6 +34,7 @@ Needs Godot 4.7 on `PATH`, or `GODOT=/path/to/godot`. Without `make`: in Godot,
 | 04  | [`04-remembered-maze`](prototypes/04-remembered-maze/)                 | If almost everything is unseen, is a change still noticeable at all?    | Played: not legible                 |
 | 05  | [`05-wick`](prototypes/05-wick/)                                       | Does the same idea work once it has a frame, an ending and sound?       | Played: not liked — closed          |
 | 06  | [`06-grapple`](prototypes/06-grapple/)                                 | Hook, swing, let go: does timing the release feel like a skill?         | Played: nice, not convinced         |
+| 07  | [`07-song-surf`](prototypes/07-song-surf/)                             | Is surfing your own song fun — riding the music, or watching a meter?   | untested                            |
 
 Each prototype's README has its keys and what to watch while testing. The
 decisions, and the playtest verdicts that close a prototype, are in

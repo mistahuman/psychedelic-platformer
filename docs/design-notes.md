@@ -765,3 +765,131 @@ not convinced, a lot missing. Not a rejection like Wick's, and not a
 confirmation either: the verb is pleasant but the prototype is too bare to
 carry it. What exactly is missing was not named — the next step is to name it
 before building anything, rather than guessing and adding features.
+
+---
+
+## Brainstorm after 06, 2026-09-25
+
+06 was "nice, not convinced", and the reason given was the right one: **no
+long-term vision.** A mechanic with nowhere to go stays "nice". Unravel came up
+as the comparison — it is remembered for the yarn character unravelling as it
+walks, not for the rope. The mechanic serves an image.
+
+So the brainstorm went image-first. Six seeds, each with a long-term shape:
+an arcade of bar-top microgames (tilt maze, stacker, claw) · a spider that
+places its own anchors in a huge house · the level is the song · a dream built
+from what you did during the day · a 30-second loop replayed alongside your
+past selves · two characters tied by a rope.
+
+Picked as interesting: the arcade, the spider, the song, the loop. The song
+most of all. Its first form — each instrument drives a part of the world, and a
+mixer to mute them — was rejected: muting was not liked. What lit up was
+**"your own songs"**. That is the hook kept; everything else was rebuilt
+around it.
+
+---
+
+## 07 — Song surf, 2026-09-25
+
+**Question:** is surfing your own song fun — does holding your speed to the
+music feel like riding it, or like watching a meter?
+
+### The shape
+
+The terrain is the song. Valleys fall on the beat grid, every 1/2/4/8 beats so
+a hill is about 720 px wide at surfing speed; a hill's height is how loud that
+stretch is, stretched across this song's own quiet-to-loud range (mastered pop
+sits near the top of its range all the time otherwise). The gesture is Tiny
+Wings: hold to be heavy, let go to be light. The music is a playhead moving at
+a fixed speed; the goal is to ride just in front of it.
+
+### Technical choices, and why
+
+- **The terrain is a pure function of x**, never geometry. Raised cosine
+  between valleys, so the slope is continuous everywhere. Nothing to stream,
+  cache, or keep in step with the audio.
+- **No physics engine.** Contact is "is y below the ground at x", and the
+  response keeps only the velocity along the slope. That one rule is the whole
+  of Tiny Wings: land along a downslope and lose nothing, land against an
+  upslope and lose the normal part. Four substeps a frame.
+- **Analysis offline, in Python with no numpy**: ffmpeg decodes and low-passes
+  to 8 kHz mono, Python works on 10 ms envelopes. Tempo by autocorrelation of
+  the low-band onset over 70–180 BPM; phase by the grid that lands on the most
+  onset energy; then a weighted least-squares fit through the actual onset
+  peaks near each grid beat. On synthetic click tracks at 96/128/150 BPM the
+  first version was 0.1% off in tempo — 0.2 s of drift by the end of a song —
+  and 20–35 ms early; after the fit, under 5 ms across 40 s. Three minutes of
+  song analyses in about three seconds.
+- **Songs never enter the repo.** `songs/` is gitignored; the analyser writes
+  an `.ogg` and a `.json` there, and Godot loads the `.ogg` at runtime with
+  `AudioStreamOggVorbis.load_from_file`.
+- **The song clock follows the audio**, not the frame count:
+  playback position + time since last mix − output latency, never allowed to
+  run backwards. Driven headless, it falls back to summing deltas.
+- **The rule is announced by sound first.** A low-pass on the master bus closes
+  as you fall behind (muffled, next room); a high-pass opens as you run ahead
+  (thin). Plus the glowing playhead and a text meter. After 03–05, a rule that
+  is only on screen is not trusted to be read.
+
+### What the bot found — and what it changed
+
+`tools/surf_bot.gd` surfs headless with four fixed policies: never press,
+always hold, dive on every downslope (`slopes`), and dive on downslopes only
+when not ahead (`sync`). Score is the share of the song spent on the wave.
+
+**Round 1, no pull.** Never pressing ended 23 s behind after a minute; diving on
+every slope ended 22 s *ahead*. Neither is on the music. The skill this game
+needs is not going fast, it is holding your speed to the song's.
+
+**Round 2, a pull toward the playhead** in both directions (a tangential force
+proportional to lag). It made the game play itself: at every strength tried,
+*always hold* beat the skilled policy (62% vs 42% at the strongest). Removed.
+
+**Round 3, a surfing wave**: a push only inside the pocket, nothing once the
+wave has passed you, drag ("dead water") once you are too far ahead.
+
+| Euforia | push 0 | push 260 | push 450 |
+| --- | --- | --- | --- |
+| never | 1% | 16% | 31% |
+| always | 2% | 21% | 15% |
+| slopes | 9% | 4% | 4% |
+| **sync** | **61%** | 35% | 27% |
+
+The push itself was the problem — any engine can be farmed. **Dead water alone**
+is what separates a player who controls speed from one who does not. The push
+stays as an export, default 0.
+
+**Round 4, steep hills.** On *Riccione* (110 BPM, loud) the skilled policy
+still slid 12 s behind: the loudest hills were up to 59°, and the speed all
+went into up-and-down rather than along. Hills are now capped at a slope of
+0.9. Final numbers, dead water only:
+
+| | Che t'o dico a fa | Euforia | Riccione |
+| --- | --- | --- | --- |
+| never | 1% | 1% | 1% |
+| always | 1% | 2% | 5% |
+| slopes | 6% | 9% | 4% |
+| **sync** | **66%** | **55%** | **45%** |
+
+A skilled policy that is this crude reaching 45–66% while every passive one sits
+under 10% is the evidence that the button matters. Whether it feels like
+riding the song is the playtest.
+
+### Verified by driving the running game
+
+With the session locked, Godot windows stop receiving frames on Wayland and
+hang — including 05 and 06, which had worked earlier. `--disable-vsync` gets
+round it. Driven for 30 s in real time: the song plays, the song clock trails
+the playback position by the output latency (≈0.08 s) and never drifts, and
+the high-pass opens when the surfer is ahead. Screenshots show loud stretches
+as tall warm hills and quiet ones as low violet rolls.
+
+### Open
+
+- Everything about feel. Unplayed at the time of writing.
+- Beat tracking assumes one steady tempo. One song in three may come out at
+  double time (*Che t'o dico a fa* read as 166 BPM); the hill grouping absorbs
+  it, but it is unconfirmed by ear.
+- The visuals are the minimum that reads. "Psychedelic" is still a word in the
+  repo name, not something on screen.
+- No sound of its own — landing, diving. The song is the only audio.
