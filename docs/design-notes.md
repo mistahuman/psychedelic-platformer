@@ -661,3 +661,31 @@ it runs out, so the unease arrives through the light rather than through the bar
 **Structure.** One maze, one attempt, no progression, no record. That is the
 remaining gap between this and a finished thing, and it is a design question
 rather than a polish one — which is why it was left rather than guessed at.
+
+---
+
+## Wick — verdict, 2026-09-25: demoted to prototype 05
+
+Played after the presentation pass, and the verdict was **"così com'è non mi
+piace"** — not "it needs structure", which is what the notes above expected, but
+a rejection of the thing as it stands. No specific reason was given, and none is
+invented here. Moved from `game/` to `prototypes/05-wick/`, with its sound script
+moving into it, so it stays playable (`make run P=05`) and standalone like the
+other four.
+
+What this closes: the "world that changes where you cannot see" line, which ran
+through 03, 04 and Wick. Three builds of the same idea, the last one legible,
+framed and with sound, and it still did not land. That is enough to stop
+iterating on it — per the rules above, its open questions (structure, catch rate,
+backtracking) are now moot.
+
+What survives is method, not mechanic: legibility first, a beginning and an
+end, a moment on screen for every rule, sound as part of the mechanic, and
+measuring with a harness where a question is measurable.
+
+Also considered and dropped the same day, before any code: a **tilt-maze** (the
+bar-top wooden labyrinth — tilt the board, roll the ball past the holes).
+Legible and framed by nature, but it was set aside as a direction.
+
+`game/` is empty until the next idea earns it.
+

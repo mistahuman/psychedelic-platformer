@@ -9,7 +9,7 @@ P ?=
 # Resolves "02" (or "02-unreliable-vision") to the full folder name.
 DIR = $(firstword $(filter $(P)%,$(PROTOTYPES)))
 
-.PHONY: help list run edit clean check game
+.PHONY: help list run edit clean check
 
 help: ## Show this help
 	@echo "psychedelic-platformer"
@@ -31,10 +31,6 @@ check:
 
 run: check ## Run a prototype (P=02)
 	$(GODOT) --path prototypes/$(DIR)
-
-game: ## Run the game in game/
-	@command -v $(GODOT) >/dev/null 2>&1 || { echo "godot not found. set GODOT=/path/to/godot"; exit 1; }
-	$(GODOT) --path game
 
 edit: check ## Open a prototype in the Godot editor (P=02)
 	$(GODOT) --editor --path prototypes/$(DIR)

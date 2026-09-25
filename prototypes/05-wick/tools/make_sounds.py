@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Generates every sound in game/audio/ from scratch.
+"""Generates every sound in audio/ from scratch.
 
 No sourced assets: the whole palette is a few sine waves, filtered noise and
 envelopes. Committed as a script rather than only as .wav files so the sounds
 can be re-tuned rather than replaced — change a number here, run it, hear it.
 
-    python3 tools/make_sounds.py
+    python3 tools/make_sounds.py   # from prototypes/05-wick
 
 Looping sounds (drone, door, heartbeat) only use frequencies that are integer
 multiples of 1/duration, so the waveform meets itself exactly at the seam and
@@ -19,7 +19,7 @@ import struct
 import wave
 
 RATE = 44100
-OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "game", "audio")
+OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "audio")
 
 
 def write(name, samples):

@@ -1,4 +1,10 @@
-# Wick
+# 05 — Wick
+
+**Question:** does a world that changes where you can't see work once it has
+a frame — a title, a run, an ending, and a moment that says it just happened?
+
+Built as "the game" in `game/`, moved here on 2026-09-25: played, not liked.
+See the verdict in the design notes.
 
 A small game. You are somewhere dark with a lantern, and the door is in the far
 corner. The maze rearranges itself where you cannot see, and the map in your
@@ -40,23 +46,23 @@ lying to you.
 ## Run
 
 ```bash
-make game           # from the repo root
+make run P=05       # from the repo root
 ```
 
-or `godot --path game`.
+or `godot --path prototypes/05-wick`.
 
 ## Sound
 
 Every sound is generated from sine waves, filtered noise and envelopes by
-[`../tools/make_sounds.py`](../tools/make_sounds.py) — no sourced assets. Re-run
+[`tools/make_sounds.py`](tools/make_sounds.py) — no sourced assets. Re-run
 it to re-tune them:
 
 ```bash
-python3 tools/make_sounds.py
+python3 tools/make_sounds.py   # from this folder
 ```
 
 ## Where this came from
 
-Four prototypes under `prototypes/`, of which this keeps one idea: a world that
+Prototypes 01–04, of which this keeps one idea: a world that
 only changes where you are not looking. What the prototypes never had — and why
-they were unreadable — is in [`../docs/design-notes.md`](../docs/design-notes.md).
+they were unreadable — is in [`../docs/design-notes.md`](../../docs/design-notes.md).
