@@ -689,3 +689,79 @@ Legible and framed by nature, but it was set aside as a direction.
 
 `game/` is empty until the next idea earns it.
 
+---
+
+## 06 — Grapple, 2026-09-25
+
+**Question:** is hook, swing, let go fun on its own — does timing the release
+feel like a skill you get better at, with one button?
+
+Picked from a brainstorm of verb-first ideas. The diagnosis behind the list:
+01–05 each started from a *concept* (a world that breathes, lies, changes behind
+you) and then went looking for a way to play it. This one starts from a *verb*
+that is already fun in other games, and asks only whether it is fun here.
+
+### Technical choices, and why
+
+- **Side view, and `player.gd` comes back.** The ground half is the controller
+  from 01–03, trimmed. Two changes: air friction dropped from 700 to 60, because
+  a release has to carry; and air steering can slow a fast release but never
+  push it past running speed, or holding a direction would erase the swing.
+- **One button.** Jump on the ground, a fresh press in the air hooks, holding
+  it keeps you on the rope, letting go releases. Walking off an edge and
+  pressing inside coyote time still jumps, which is the right way round.
+- **Instant attach, no projectile.** A hook that travels adds a second timing
+  on top of the one being tested.
+- **Rigid rope that can go slack.** Outward velocity is removed only when the
+  rope is taut, and position is snapped back if it drifts past the length.
+  Swinging over the top of the anchor is therefore possible, and so far fine.
+- **Pumping** is tangential acceleration from the held direction, only below
+  the anchor — above it, it would be a jetpack.
+- **The target is shown.** A gold ring and a dashed line on the anchor a press
+  would catch, recomputed every frame: nearest above you and in range, with a
+  120 px thumb on the scale for the one ahead. Without it the choice is
+  invisible and every miss reads as the game's fault — the lesson from 03–05.
+- **A frame from day one:** title card, clock, fall counter, flag, best time,
+  `R` to go again. The course has five stretches, each teaching one thing:
+  one swing, a chain of two, a chain of three, a platform you have to pump up
+  to, and the run to the flag.
+- The layout is two tables in `course.gd`, not a hand-authored `.tscn`.
+
+### What the bot found
+
+`tools/course_bot.gd` plays headless with a fixed policy — run right, jump at
+edges, hook the ringed anchor when falling, pump with the motion, let go at a
+fixed angle past vertical — and reports platforms reached.
+
+| Release angle | Result |
+| --- | --- |
+| 0.50 rad | stuck after platform 2, 32 falls in 120 s |
+| 0.65 rad | stuck after platform 3, 49 falls |
+| **0.80 rad** | **flag in 15.1 s, 0 falls, 9 hooks** |
+| 0.95 rad | stuck after platform 2, 22 falls |
+
+Two things this says. The course is passable. And **no single release angle
+works everywhere except by luck** — the bot passes at one angle and fails
+either side of it, which is the evidence that the release is a decision
+rather than a formality. A human changes the angle per swing; the bot cannot.
+Whether making that decision *feels* good is what the playtest is for.
+
+It also found a bug before any human did: the first good release cleared the
+last platform and left the world on the right. There are now walls at both
+ends.
+
+### Open
+
+- Everything about feel. Unplayed at the time of writing.
+- Anchor selection on a crowded screen — the course never puts two good
+  candidates close together, so the bias is untested.
+- No audio. A rope-catch sound and a whoosh on release are the obvious two, and
+  after 05 there is a script for making them.
+
+### First play, 2026-09-25
+
+**"Carino però non sono molto convinto, manca davvero di tante cose."** Nice,
+not convinced, a lot missing. Not a rejection like Wick's, and not a
+confirmation either: the verb is pleasant but the prototype is too bare to
+carry it. What exactly is missing was not named — the next step is to name it
+before building anything, rather than guessing and adding features.
