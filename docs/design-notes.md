@@ -893,3 +893,168 @@ as tall warm hills and quiet ones as low violet rolls.
 - The visuals are the minimum that reads. "Psychedelic" is still a word in the
   repo name, not something on screen.
 - No sound of its own — landing, diving. The song is the only audio.
+
+---
+
+## 08 — Rolla, 2026-10-13
+
+**Question:** is fighting two clumsy physical hands funny, or just annoying?
+
+Came in from outside the brainstorm, as a written brief: a first-person,
+deliberately frustrating sandbox in the QWOP / Surgeon Simulator line, where two
+gamepad-driven hands try to roll one and light it. First 3D prototype here, and
+the first on a physics engine (Jolt, built into Godot since 4.4). 07 was still
+unplayed when this was built.
+
+Weighed before building. For it: it starts from a verb like 06, but arrives with
+an image and an ending like the post-06 brainstorm asked for — the roadmap ends
+on a lit joint. And it is legible for free: everything is a physical thing on a
+table. Against it, and what was changed because of it:
+
+- **The brief's milestone 1 had no beginning or end** ("grab, move, drop").
+  It got a tray, a clock and a drop counter, so there is something to finish
+  and a reason to go again.
+- **Pure chance reads as the game's fault.** The brief had a random impulse
+  after a second of full squeeze. The pop stayed, but it is announced: strain
+  fills, the hand reddens and shakes harder, then the thing goes. Only its
+  direction is random.
+- **Height is unreadable from a fixed camera.** The lamp is a directional light
+  pointing straight down, so each hand's shadow is exactly below it.
+- The real game is milestone 2 (the paper), and this prototype does not test
+  it. It is a prerequisite kept small.
+
+### Technical choices, and why
+
+- **Hands are pulled, never placed.** A `RigidBody3D` with gravity off and a
+  spring-damper force toward a target the input moves. Stiffness 80, damping 6:
+  about 0.34 of critical, so it visibly overshoots. The force is mass-scaled
+  and capped, and a carried weight is not compensated — the 0.4 kg grinder
+  drags the hand down about 10 cm, which is how weight is felt.
+- **Rotation is locked.** A hand that tumbles needs an uprighting torque and a
+  reason; the wobble in position is enough for the question.
+- **The claw's colliders stay open; only the finger meshes close.** Things up
+  to 10 cm fit between the fingers. Moving colliders every frame bought nothing.
+- **Grab is a `PinJoint3D`, not a weld,** created at the point between the
+  fingertips when the grip crosses 0.5 *upwards* — a fist dragged over a thing
+  does not grab. The thing hangs and swings from wherever it was caught.
+- **The grip ramps instead of switching,** because the keyboard is the only
+  input for now and a key is not a trigger. Held, it closes at 1.0/s; released,
+  it opens at 1.5/s. Latch at 0.5, release at 0.3, strain above 0.9. Holding
+  something therefore means tapping. Whether that is a skill or a chore is one
+  of the things to watch; on a pad the trigger sets the grip directly.
+- **Slip is estimated, since the joint reports no force:** the held thing's
+  mass times how its acceleration differs from free fall, smoothed. It lets go
+  when that passes `hold_force × grip`.
+- **Tuning is one shared `Resource`** (`tuning.tres`), referenced by both
+  hands. No `class_name`: the script is preloaded, so the project runs without
+  the editor's class cache.
+- Keyboard is over-bound on purpose, to be pruned after a play. Left and right
+  Shift are told apart with `InputEventKey.location`, checked against the
+  action map. The gamepad bindings exist and are untested — no pad connected.
+
+### What the bot found
+
+`tools/grab_bot.gd` drives the nearer hand through the real actions: over the
+item, down, close, lift, over the tray, open.
+
+| | Result (3 runs each) | Peak load |
+| --- | --- | --- |
+| papers 0.05 kg | in the tray 3/3 | 0.7 N |
+| lighter 0.15 kg | in the tray 3/3 | 1.9 N |
+| filter 0.02 kg | in the tray 3/3 | 0.3 N |
+| grinder 0.4 kg | in the tray 3/3 | 7.0–7.5 N |
+
+So the chain works and the task is possible. With `hold_force` 12 the grinder
+needs a grip above about 0.6 while moving and slips out on its own just before
+the fingers reach the release point; the light things never slip. A full
+squeeze pops 1.4 s after the grab.
+
+The first version of the bot always used the right hand and failed on the
+papers: reaching across, it ran into the left hand and got stuck against it.
+Hands block each other — kept, it is the kind of accident the idea is about.
+
+### Open
+
+- Everything about feel. Unplayed at the time of writing.
+- The gamepad, the device the idea was written for.
+- No audio, against the lesson from 05. Nothing here has a rule that only a
+  sound could announce, so it was left for after the first play.
+
+### First play, 2026-10-14
+
+**"La dinamica di presa non è giocabile… non capisco come afferrare le cose."**
+And the goal was wrong: not a tray to fill, but a sandbox where you actually
+prepare one and roll it.
+
+The grab failed for the reason 06 had already written down and 08 did not
+apply: **the target was not shown.** Nothing said what a grip would take, the
+height had to be found by hand on a third axis, and the ramping grip asked for
+tapping on top of that. Three hidden things in a row, and the player saw none
+of them.
+
+Redone the same day:
+
+- **A claw machine.** The nearest thing in a column under the hand lights up.
+  Holding the grip dips the hand onto it, grabs, and brings it back to the
+  carry height; letting go drops it. Height is now a carry height, not a
+  thing you must hit.
+- **The ramp, the strain and the pop are gone.** The frustration was in the
+  wrong place — the input, not the world. What is left is the arm (lag,
+  overshoot, wobble), the swing of a pinned thing, and heavy things slipping
+  when jerked (`hold_force` 9 N, now constant).
+- **The tray, the clock and the drop counter are gone.** Sandbox.
+
+The bot now picks up every item and carries it across the table; the grinder
+peaks at 4.5 N.
+
+### The whole loop, 2026-10-14
+
+Asked for the same day: two-handed back-and-forth rolling, and every step —
+sheet out of the papers, crumbs out of the grinder, filter, lick to seal,
+light, a score. Built as one scene; the six steps are a checklist in the
+corner that says what to do next, so no rule goes unannounced.
+
+- **Shaking is the player wiggling, not the thing jolting.** The first version
+  summed the held item's velocity changes; the spring filters a fast wiggle so
+  well that the papers never triggered. It now counts how often the holding
+  hand's *target* changes direction: four reversals in a second. Carrying
+  never does that, a wiggle always does, heavy or light.
+- **Rolling reads the targets too.** Both hands are welded to one sheet, so
+  their bodies cannot disagree much; their targets are the player's input.
+  Progress is back-and-forth with both moving the same way, at most 12 cm per
+  stroke so a long push does not count. Out-of-step movement is `twist`: it
+  lowers neatness and leaks a crumb every 12 cm. Pulling the targets apart by
+  6 cm more than when both took hold tears the sheet.
+- **The sheet and the lighter are welded** (a `Generic6DOFJoint3D` with its
+  default all-locked limits); everything else still hangs from a pin. A sheet
+  on a pin hangs vertically from one corner, and a dangling flame cannot be
+  aimed.
+- **What lies on the sheet is taken in when a hand picks it up,** not when the
+  second one does: the first hand's lift tipped everything off before the
+  second could arrive.
+- **Crumbs are boxes.** Spheres rolled off the sheet at the slightest tilt —
+  of 42 crumbs, 0–1 stayed. As boxes with some damping, 11.
+- **The flame sits 2 cm past the end of the lighter.** At the end itself it was
+  under the fingers, and bringing it to the tip meant shoving the joint away
+  with the hand.
+
+`tools/roll_bot.gd` plays the whole loop with a fixed policy (seeded, so runs
+repeat). Most of its debugging was the bot's own routing — hands blocking
+each other, which a person steers round.
+
+| Policy | Rolled in | Neat | Crumbs kept | Result | Score |
+| --- | --- | --- | --- | --- | --- |
+| in step, 0.2 s strokes | 2.3 s | 99% | 11 of 11 | lit | 387 |
+| in step, 0.3 s strokes | 3.4 s | 99% | 11 of 11 | lit | 386 |
+| right hand half a stroke late | 6.8 s | 0% | 0 of 11 | lit | 226 |
+
+The loop can be finished, and doing it well scores clearly better than doing
+it badly. The sloppy bot is far sloppier than a person; with `twist_max` at
+1.0 a person 50 ms out of step should land around a third neat.
+
+### Open
+
+- Everything about feel. Unplayed at the time of writing.
+- Rolling two hands on one keyboard needs four keys held in pairs. A pad
+  would make it two sticks — still untested.
+- No audio: a click and a flame for the lighter are the obvious first two.

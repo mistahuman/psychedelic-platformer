@@ -2,8 +2,9 @@
 
 Godot 4 / GDScript. Right now this is **a prototype repo**:
 
-- **`prototypes/`** — closed attempts kept as a record, and **07 song surf**, the one
-  being tested: your own songs turned into terrain. 05 Wick was built as "the game" in `game/`, played, not liked,
+- **`prototypes/`** — closed attempts kept as a record, and the two being tested:
+  **07 song surf** (your own songs turned into terrain) and **08 rolla** (two clumsy
+  physical hands at a table, 3D). 05 Wick was built as "the game" in `game/`, played, not liked,
   and demoted on 2026-09-25.
 - **`game/`** — does not exist at the moment. It comes back when an idea earns it.
 
@@ -80,6 +81,12 @@ parse and runtime error.
   overlay and function keys, not the editor's Remote inspector. The reason first given
   was WSLg window focus; the reason it stays is better — the overlay keeps the tuning
   in the same window as the feel being tuned, and it is what a playtester can use.
+- **No `class_name` for something a `.tres` or a tool script needs.** Preload the
+  script into a const instead (08's `hand_tuning.gd`): global classes come from the
+  editor's cache, which a fresh clone run with `make run` does not have.
+- **`-s` tool scripts do not get the autoloads**, and nodes added in `_initialize()`
+  are not in the tree yet — add `controls.gd` by hand and do not read
+  `global_position` there.
 - Input actions are registered at runtime by a `controls.gd` autoload rather than in
   `project.godot`'s InputMap, so bindings stay diffable. It only registers an action that
   does not already exist.
@@ -170,4 +177,12 @@ screen — there the lantern, not the camera, is what bounds sight.
   gitignored — songs are analysed locally by `tools/analyse_song.py` and never
   committed. Tuned by a bot until skill mattered: dead water ahead, no push.
 
-Next: play 07 with a song you love.
+- 08 rolla — built 2026-10-13 from a written brief, **untested.** First 3D
+  prototype and first on Jolt: first person at a table, two spring-pulled hands.
+  First play (2026-10-14): the grab was unreadable and the tray goal unwanted.
+  Redone with a claw-machine grab (the thing under the hand lights up, hold to
+  dip and take it) and the whole loop: sheet, crumbs, filter, two-handed roll,
+  seal at the mouth, light, score. `tools/roll_bot.gd` plays it end to end.
+  Keyboard only; gamepad bindings exist, unverified.
+
+Next: play 07 with a song you love, and play 08.

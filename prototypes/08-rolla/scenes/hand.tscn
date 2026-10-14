@@ -1,0 +1,85 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hand.gd" id="1"]
+[ext_resource type="Resource" path="res://tuning.tres" id="2"]
+
+[sub_resource type="BoxShape3D" id="palm_shape"]
+size = Vector3(0.13, 0.025, 0.12)
+
+[sub_resource type="BoxShape3D" id="finger_shape"]
+size = Vector3(0.015, 0.06, 0.1)
+
+[sub_resource type="SphereShape3D" id="grab_shape"]
+radius = 0.05
+
+[sub_resource type="CylinderShape3D" id="column_shape"]
+radius = 0.05
+height = 0.4
+
+[sub_resource type="BoxMesh" id="palm_mesh"]
+size = Vector3(0.13, 0.025, 0.12)
+
+[sub_resource type="BoxMesh" id="finger_mesh"]
+size = Vector3(0.015, 0.06, 0.1)
+
+[sub_resource type="StandardMaterial3D" id="marker_material"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.3, 1, 0.9, 0.5)
+
+[sub_resource type="SphereMesh" id="marker_mesh"]
+material = SubResource("marker_material")
+radius = 0.012
+height = 0.024
+
+; A claw seen from above: a palm with two fingers hanging down. The finger
+; colliders stay open (things fit between them); only the meshes close.
+[node name="Hand" type="RigidBody3D" groups=["hand"]]
+mass = 0.5
+gravity_scale = 0.0
+axis_lock_angular_x = true
+axis_lock_angular_y = true
+axis_lock_angular_z = true
+script = ExtResource("1")
+tuning = ExtResource("2")
+
+[node name="Palm" type="CollisionShape3D" parent="."]
+shape = SubResource("palm_shape")
+
+[node name="FingerA" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0575, -0.0425, 0)
+shape = SubResource("finger_shape")
+
+[node name="FingerB" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0575, -0.0425, 0)
+shape = SubResource("finger_shape")
+
+[node name="PalmMesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("palm_mesh")
+
+[node name="FingerMeshA" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0575, -0.0425, 0)
+mesh = SubResource("finger_mesh")
+
+[node name="FingerMeshB" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0575, -0.0425, 0)
+mesh = SubResource("finger_mesh")
+
+; What is inside this sphere when the fingers close is what gets grabbed.
+[node name="GrabArea" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.045, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="GrabArea"]
+shape = SubResource("grab_shape")
+
+; Everything in this column under the hand is a candidate; the nearest lights up.
+[node name="Column" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Column"]
+shape = SubResource("column_shape")
+
+[node name="TargetMarker" type="MeshInstance3D" parent="."]
+top_level = true
+visible = false
+mesh = SubResource("marker_mesh")

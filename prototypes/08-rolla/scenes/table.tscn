@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[sub_resource type="PhysicsMaterial" id="surface"]
+friction = 0.9
+
+[sub_resource type="BoxShape3D" id="shape"]
+size = Vector3(1.4, 0.06, 0.9)
+
+[sub_resource type="StandardMaterial3D" id="wood"]
+albedo_color = Color(0.42, 0.27, 0.16, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="mesh"]
+material = SubResource("wood")
+size = Vector3(1.4, 0.06, 0.9)
+
+; The top surface is at y = 0: every height in this prototype is "above the table".
+[node name="Table" type="StaticBody3D"]
+physics_material_override = SubResource("surface")
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.03, 0)
+shape = SubResource("shape")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.03, 0)
+mesh = SubResource("mesh")
